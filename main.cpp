@@ -363,21 +363,27 @@ void paint_selectRect(const POINT rb_point)
 */
 void paint_info(const POINT rb_point)
 {
-	const int radius = 25;			// 真实框半径25pix
-	const int interval = 50;		// 显示框与鼠标横纵间隔为50pix
-	const int frameSize = 150;		// 显示框（正方形）的横纵size为150pix
-	const int textBoxWidth = 50;	// 文字框高度为50pix
-	const int textSize = 17;		// 字体大小
+	int radius = 25;			// 真实框半径25pix
+	int intervalX = 50;		// 显示框与鼠标横间隔为50pix
+	int intervalY = 50;		// 显示框与鼠标纵间隔为50pix
+	int frameSize = 150;		// 显示框（正方形）的横纵size为150pix
+	int textBoxWidth = 50;	// 文字框高度为50pix
+	int textSize = 17;		// 字体大小
 
-									/* 绘制放大框图片 */
+	if (rb_point.y >= desktop_height - intervalY - frameSize - textBoxWidth)
+		intervalY = -1 * (intervalY + frameSize + textBoxWidth);
+	if (rb_point.x >= desktop_width - intervalX - frameSize)
+		intervalX = -1 * (intervalX + frameSize);
+
+	/* 绘制放大框图片 */
 	drawData[7] == NULL ?
 		drawData[7] = new DT_image(
-			rb_point.x + interval, rb_point.y + interval,
+			rb_point.x + intervalX, rb_point.y + intervalY,
 			frameSize, frameSize,
 			((DT_image*)drawData[0])->getImg(),
 			rb_point.x - radius, rb_point.y - radius, 2 * radius, 2 * radius) :
 			((DT_image*)drawData[7])->setData(
-				rb_point.x + interval, rb_point.y + interval,
+				rb_point.x + intervalX, rb_point.y + intervalY,
 				frameSize, frameSize,
 				((DT_image*)drawData[0])->getImg(),
 				rb_point.x - radius, rb_point.y - radius, 2 * radius, 2 * radius);
@@ -385,31 +391,31 @@ void paint_info(const POINT rb_point)
 	/* 绘制竖十字架 */
 	drawData[8] == NULL ?
 		drawData[8] = new DT_rectangle(
-			rb_point.x + interval + frameSize / 2, rb_point.y + interval,
-			rb_point.x + interval + frameSize / 2 + 2, rb_point.y + interval + frameSize,
+			rb_point.x + intervalX + frameSize / 2, rb_point.y + intervalY,
+			rb_point.x + intervalX + frameSize / 2 + 2, rb_point.y + intervalY + frameSize,
 			RGB(0, 255, 0), 2, NULL_BRUSH, PS_SOLID) :
-			((DT_rectangle*)drawData[8])->setData(rb_point.x + interval + frameSize / 2, rb_point.y + interval,
-				rb_point.x + interval + frameSize / 2 + 2, rb_point.y + interval + frameSize);
+			((DT_rectangle*)drawData[8])->setData(rb_point.x + intervalX + frameSize / 2, rb_point.y + intervalY,
+				rb_point.x + intervalX + frameSize / 2 + 2, rb_point.y + intervalY + frameSize);
 
 	/* 绘制横十字架 */
 	drawData[9] == NULL ?
 		drawData[9] = new DT_rectangle(
-			rb_point.x + interval, rb_point.y + interval + frameSize / 2,
-			rb_point.x + interval + frameSize, rb_point.y + interval + frameSize / 2 + 2,
+			rb_point.x + intervalX, rb_point.y + intervalY + frameSize / 2,
+			rb_point.x + intervalX + frameSize, rb_point.y + intervalY + frameSize / 2 + 2,
 			RGB(0, 255, 0), 2, NULL_BRUSH, PS_SOLID) :
 			((DT_rectangle*)drawData[9])->setData(
-				rb_point.x + interval, rb_point.y + interval + frameSize / 2,
-				rb_point.x + interval + frameSize, rb_point.y + interval + frameSize / 2 + 2);
+				rb_point.x + intervalX, rb_point.y + intervalY + frameSize / 2,
+				rb_point.x + intervalX + frameSize, rb_point.y + intervalY + frameSize / 2 + 2);
 
 	/* 绘制文字区域背景 */
 	drawData[10] == NULL ?
 		drawData[10] = new DT_rectangle(
-			rb_point.x + interval, rb_point.y + interval + frameSize,
-			rb_point.x + interval + frameSize, rb_point.y + interval + frameSize + textBoxWidth,
+			rb_point.x + intervalX, rb_point.y + intervalY + frameSize,
+			rb_point.x + intervalX + frameSize, rb_point.y + intervalY + frameSize + textBoxWidth,
 			RGB(0, 0, 0), 1, BLACK_BRUSH, PS_SOLID) :
 			((DT_rectangle*)drawData[10])->setData(
-				rb_point.x + interval, rb_point.y + interval + frameSize,
-				rb_point.x + interval + frameSize, rb_point.y + interval + frameSize + textBoxWidth);
+				rb_point.x + intervalX, rb_point.y + intervalY + frameSize,
+				rb_point.x + intervalX + frameSize, rb_point.y + intervalY + frameSize + textBoxWidth);
 
 	/* 绘制POS信息 */
 	memset(buf_pos, 0, sizeof(buf_pos));
@@ -417,10 +423,10 @@ void paint_info(const POINT rb_point)
 	drawData[11] == NULL ?
 		drawData[11] = new DT_text(
 			TRANSPARENT, RGB(255, 255, 255),
-			rb_point.x + interval, rb_point.y + interval + frameSize,
+			rb_point.x + intervalX, rb_point.y + intervalY + frameSize,
 			buf_pos, textSize) :
 			((DT_text*)drawData[11])->setData(
-				rb_point.x + interval, rb_point.y + interval + frameSize, buf_pos);
+				rb_point.x + intervalX, rb_point.y + intervalY + frameSize, buf_pos);
 
 	/* 绘制RGB信息 */
 	Gdiplus::Color color;
@@ -430,10 +436,10 @@ void paint_info(const POINT rb_point)
 	drawData[12] == NULL ?
 		drawData[12] = new DT_text(
 			TRANSPARENT, RGB(255, 255, 255),
-			rb_point.x + interval, rb_point.y + interval + frameSize + textBoxWidth / 2,
+			rb_point.x + intervalX, rb_point.y + intervalY + frameSize + textBoxWidth / 2,
 			buf_rgb, textSize) :
 			((DT_text*)drawData[12])->setData(
-				rb_point.x + interval, rb_point.y + interval + frameSize + textBoxWidth / 2, buf_rgb);
+				rb_point.x + intervalX, rb_point.y + intervalY + frameSize + textBoxWidth / 2, buf_rgb);
 
 }
 
